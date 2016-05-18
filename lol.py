@@ -47,7 +47,6 @@ for tour in range(1,nbTours+1):
 	"""ajoute à l'histoire les nouveaux mots entrés par le joueur"""
 	histoire += input().split()
 
-	
 """affiche l'histoire finie"""
 print("\n\nHistoire : ")
 for mot in histoire:
