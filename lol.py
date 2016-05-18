@@ -1,52 +1,54 @@
-﻿
+﻿def getNumberInput(question):
+	"""demande à l'utilisateur un entier plus grand que 0"""
+	retour=0
+	while(retour < 1):
+		print(question)
+		try:
+			retour = int(input())
+		except:
+			retour = 0
+	return retour		
+
+"""initialisation des variables"""
 nbToursParJoueur=0
 nbMotsApparents=0
-histoire=""
 listeJoueur=[]
-ptr=0
+joueurDontCEstLeTour=0
+histoire=[]
 
+"""configuration de la partie"""
 while(len(listeJoueur) < 1):
 	print("Entrez le pseudo des joueurs, séparés par des espaces")
 	listeJoueur = input().split()
-
-
-def getNumberInput(question):
-	variable=0
-	while(variable < 1):
-		print(question)
-		try:
-			variable = int(input())
-		except:
-			variable = 0
-	return variable		
-			
 nbToursParJoueur = getNumberInput("Combien de tours par joueur ?")
 nbMotsApparents = getNumberInput("Combien de mots apparents ?")
-	
+
 nbTours = nbToursParJoueur*len(listeJoueur)
 
-for i in range(nbTours):
-	
+for tour in range(1,nbTours+1):
 	print("\n"*10);
 	
-	print(listeJoueur[ptr] + " - tour " + str(i+1) + "/" + str(nbTours), end=" : ")
-	ptr = (ptr+1)%len(listeJoueur)
+	print(listeJoueur[joueurDontCEstLeTour] + " - tour " + str(tour) + "/" + str(nbTours), end=" : ")
+	"""chacun son tour, j1 puis j2 puis j3 puis à nouveau j1 etc..."""
+	joueurDontCEstLeTour = (joueurDontCEstLeTour+1)%len(listeJoueur)
 	
-	if(i==0):
+	"""selon l'avancement du jeu, on informe le joueur de ce qu'il doit faire"""
+	if(tour==1):
 		print("Commencez l'histoire")
-	elif(i==nbTours-1):
+	elif(tour==nbTours):
 		print("Finissez l'histoire")
 	else:
 		print("Continuez l'histoire")
 	
-	mots = histoire.split();
-	for mot in mots[-nbMotsApparents:]:
+	"""on affiche les quelques derniers mots de l'histoire"""
+	for mot in histoire[-nbMotsApparents:]:
 		print(mot,end=' ')
 	
-	histoire += input()
-	
-	if(histoire[-1]!=' '):
-		histoire += ' '
-		
+	"""ajoute à l'histoire les nouveaux mots entrés par le joueur"""
+	histoire += input().split()
 
-print("\n\nHistoire : " + histoire)
+	
+"""affiche l'histoire finie"""
+print("\n\nHistoire : ")
+for mot in histoire:
+	print(mot,end=' ')
