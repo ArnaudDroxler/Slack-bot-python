@@ -1,8 +1,8 @@
 import time
 
 from slackclient import SlackClient
+from config import TOKEN
 
-TOKEN="xoxb-45725674864-VkW4jUC0mwxEvEUipTOTextD"
 
 bot = SlackClient(TOKEN)
 

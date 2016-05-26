@@ -65,3 +65,9 @@ target/
 Scripts
 Lib
 Include
+
+#token
+config.py
+pip-selfcheck.json
+pyvenv.cfg
+requirements.txt
