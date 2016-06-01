@@ -1,7 +1,7 @@
 import time
 
 from slackclient import SlackClient
-from config import TOKEN
+from config import TOKEN, BOT_ID
 
 
 def send(joueur, message) :
@@ -12,37 +12,6 @@ def send(joueur, message) :
 def sendToAll(listeJoueurs, message) :
 	for joueur in listeJoueurs:
 		send(joueur, message)
-
-
-
-def jeu(nbToursParJoueur, nbMotsApparents, joueurs, input):
-	joueurDontCEstLeTour=0
-	histoire=[]
-
-	nbTours = nbToursParJoueur*len(joueurs)
-	
-	for tour in range(1,nbTours+1):
-		send(joueurs[joueurDontCEstLeTour], "tour " + str(tour) + "/" + str(nbTours) + " : ")
-		"""chacun son tour, j1 puis j2 puis j3 puis à nouveau j1 etc..."""
-		joueurDontCEstLeTour = (joueurDontCEstLeTour+1)%len(joueurs)
-		
-		"""selon l'avancement du jeu, on informe le joueur de ce qu'il doit faire"""
-		if(tour==1):
-			send(joueurs[joueurDontCEstLeTour], "Commencez l'histoire")
-		elif(tour==nbTours):
-			send(joueurs[joueurDontCEstLeTour], "Finissez l'histoire")
-		else:
-			send(joueurs[joueurDontCEstLeTour], "Continuez l'histoire")
-		
-		"""on affiche les quelques derniers mots de l'histoire"""
-		for mot in histoire[-nbMotsApparents:]:
-			send(joueurs[joueurDontCEstLeTour],mot + ' ')
-		
-		"""ajoute à l'histoire les nouveaux mots entrés par le joueur"""
-		histoire += input.split()
-
-	"""affiche l'histoire finie"""
-	sendToAll(joueurs, "Histoire : " + str(histoire))
 	
 	
 
@@ -73,14 +42,14 @@ def process(user, message):
 		
 	if(ETAT=="JEU_EN_COURS"):
 		print(ETAT)	
-		send(LISTE_JOUEURS[JOUEUR_I], "tour " + str(TOUR) + "/" + str(NB_TOURS) + " : ")
+		info_tour = "tour " + str(TOUR) + "/" + str(NB_TOURS) + " : "
 		if(TOUR==1):
-			send(LISTE_JOUEURS[JOUEUR_I], "Commencez l'histoire")
+			send(LISTE_JOUEURS[JOUEUR_I], info_tour + "Commencez l'histoire :")
 		elif(TOUR==NB_TOURS):
-			send(LISTE_JOUEURS[JOUEUR_I], "Finissez l'histoire")
+			send(LISTE_JOUEURS[JOUEUR_I], info_tour + "Finissez l'histoire :")
 			ETAT="FIN_JEU"
 		else:
-			send(LISTE_JOUEURS[JOUEUR_I], "Continuez l'histoire")
+			send(LISTE_JOUEURS[JOUEUR_I], info_tour + "Continuez l'histoire :")
 		
 		if(message != ""):
 			HISTOIRE += message.split()
@@ -95,8 +64,11 @@ def process(user, message):
 		JOUEUR_I = (JOUEUR_I+1)%len(LISTE_JOUEURS)
 		
 	if(ETAT=="FIN_JEU"):
-		print(ETAT)	
-		sendToAll(LISTE_JOUEURS, "Histoire : " + str(HISTOIRE))
+		print(ETAT)
+		his=''
+		for mot in HISTOIRE:
+			his += mot + ' '
+		sendToAll(LISTE_JOUEURS, "Histoire terminée : " + his)
 		
 		
 ETAT = "INIT"
@@ -118,7 +90,7 @@ if bot.rtm_connect():
 				for message in messages :
 					#print(message)
 					if "type" in message and message['type'] == 'message':
-						if message['user'] != 'U1BU2CA1G': # id du bot
+						if message['user'] != BOT_ID: # id du bot
 							print(message)
 							process(message['user'], message['text'])
 								
