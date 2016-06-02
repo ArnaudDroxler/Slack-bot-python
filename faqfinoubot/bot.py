@@ -14,6 +14,7 @@ g_mots=[]
 g_tour=0
 g_bot = SlackClient(TOKEN)
 g_slack_users_list=[]
+g_joueur_courant=""
 
 			
 def send(joueur, message) :
@@ -46,7 +47,7 @@ def validate(user, message):
 		
 		
 def process(user, message):
-	global g_etat, g_g_tours_par_joueur, g_nb_mots_apparents, g_joueurs, g_nb_g_tours, g_indice_joueur, g_mots, g_tour
+	global g_etat, g_g_tours_par_joueur, g_nb_mots_apparents, g_joueurs, g_nb_g_tours, g_indice_joueur, g_mots, g_tour, g_joueur_courant
 	
 	print(">>>> PROCESSING")
 	print(">>>> user : " + user + "  -- message : " + message + " -- etat : " + g_etat)
@@ -55,7 +56,6 @@ def process(user, message):
 		print(">>>>>> etat : " + g_etat)
 		
 		validation = validate(user, message);
-		print(">>>>>>>> validation : " + str(validation))
 		if(validation["ok"]):
 			sendToAll(g_joueurs, "Une partie de cadavre exquis est lancée, restez attentifs")
 			g_etat="DEBUT_JEU"
@@ -72,33 +72,42 @@ def process(user, message):
 		g_tour=0
 		message = ""
 		g_etat="JEU_EN_COURS"
+		g_joueur_courant=user
 
 	if(g_etat=="JEU_EN_COURS"):
 		print(">>>>>> etat : " + g_etat)
 
-		g_tour = g_tour+1
+		if user in g_joueurs:
+			if(g_joueur_courant==user):
+				g_tour = g_tour+1
 
-		info_g_tour = "Tour " + str(g_tour) + "/" + str(g_nb_g_tours) + " : "
-		if(g_tour==1):
-			send(g_joueurs[g_indice_joueur], info_g_tour + "Commencez l'histoire :")
-		elif(g_tour < g_nb_g_tours):
-			send(g_joueurs[g_indice_joueur], info_g_tour + "Continuez l'histoire :")
-		elif(g_tour==g_nb_g_tours):
-			send(g_joueurs[g_indice_joueur], info_g_tour + "Finissez l'histoire :")
+				info_g_tour = "Tour " + str(g_tour) + "/" + str(g_nb_g_tours) + " : "
+				if(g_tour==1):
+					send(g_joueurs[g_indice_joueur], info_g_tour + "Commencez l'histoire :")
+				elif(g_tour < g_nb_g_tours):
+					send(g_joueurs[g_indice_joueur], info_g_tour + "Continuez l'histoire :")
+				elif(g_tour==g_nb_g_tours):
+					send(g_joueurs[g_indice_joueur], info_g_tour + "Finissez l'histoire :")
 
-		if(message != ""):
-			g_mots += message.split()
+				if(message != ""):
+					g_mots += message.split()
 
-			if(g_tour<=g_nb_g_tours):
-				qlqsMots=""
-				for mot in g_mots[-g_nb_mots_apparents:]:
-					qlqsMots += mot + ' '
+					if(g_tour<=g_nb_g_tours):
+						qlqsMots=""
+						for mot in g_mots[-g_nb_mots_apparents:]:
+							qlqsMots += mot + ' '
 
-				send(g_joueurs[g_indice_joueur], qlqsMots)
+						send(g_joueurs[g_indice_joueur], qlqsMots)
+					else:
+						g_etat="FIN_JEU"
+
+				g_joueur_courant = g_joueurs[g_indice_joueur]
+				g_indice_joueur = (g_indice_joueur+1)%len(g_joueurs)
+			
 			else:
-				g_etat="FIN_JEU"
-
-		g_indice_joueur = (g_indice_joueur+1)%len(g_joueurs)
+				send(user, "Ce n'est pas votre tour")
+		else:
+			send(user, "Une partie est déjà en cours")
 
 	if(g_etat=="FIN_JEU"):
 		print(">>>>>> etat : " + g_etat)
