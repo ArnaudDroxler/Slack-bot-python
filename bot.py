@@ -5,7 +5,7 @@ from config import TOKEN, BOT_ID
 
 
 def send(joueur, message) :
-	reponse = bot.api_call("chat.postMessage", as_user=True, channel=joueur, text=message)
+	reponse = g_bot.api_call("chat.postMessage", as_user=True, channel=joueur, text=message)
 	print(reponse)
 
 
@@ -13,79 +13,82 @@ def sendToAll(listeJoueurs, message) :
 	for joueur in listeJoueurs:
 		send(joueur, message)
 	
-	
 
 def process(user, message):
-	global ETAT, NB_TOURS_PAR_JOUEUR, NB_MOTS_APPARENTS, LISTE_JOUEURS, NB_TOURS, JOUEUR_I, HISTOIRE, TOUR
+	global g_etat, g_g_tours_par_joueur, g_nb_mots_apparents, g_joueurs, g_nb_g_tours, g_indice_joueur, g_mots, g_tour
 		
-	if(ETAT=="CONNECTE"):
-		print(ETAT)	
+	if(g_etat=="CONNECTE"):
+		print(g_etat)	
 		print(user + " dit " + message)
-		LISTE_JOUEURS = [user]
+		g_joueurs = [user]
 		for joueur in message.split():
-			LISTE_JOUEURS.append(joueur[2:-1])
+			g_joueurs.append(joueur[2:-1])
 		
-		print(LISTE_JOUEURS)
-		sendToAll(LISTE_JOUEURS, "Une partie de cadavre exquis est lancée, restez attentifs")
-		ETAT="DEBUT_JEU"
+		print(g_joueurs)
+		sendToAll(g_joueurs, "Une partie de cadavre exquis est lancée, restez attentifs")
+		g_etat="DEBUT_JEU"
 		
-	if(ETAT=="DEBUT_JEU"):
-		print(ETAT)	
-		NB_TOURS_PAR_JOUEUR = 3
-		NB_MOTS_APPARENTS = 5
-		NB_TOURS = NB_TOURS_PAR_JOUEUR*len(LISTE_JOUEURS)
-		JOUEUR_I = 0
-		HISTOIRE = []
-		TOUR=1
+	if(g_etat=="DEBUT_JEU"):
+		print(g_etat)	
+		g_g_tours_par_joueur = 2
+		g_nb_mots_apparents = 5
+		g_nb_g_tours = g_g_tours_par_joueur*len(g_joueurs)
+		g_indice_joueur = 0
+		g_mots = []
+		g_tour=0
 		message = ""
-		ETAT="JEU_EN_COURS"
+		g_etat="JEU_EN_COURS"
 		
-	if(ETAT=="JEU_EN_COURS"):
-		print(ETAT)	
-		info_tour = "tour " + str(TOUR) + "/" + str(NB_TOURS) + " : "
-		if(TOUR==1):
-			send(LISTE_JOUEURS[JOUEUR_I], info_tour + "Commencez l'histoire :")
-		elif(TOUR==NB_TOURS):
-			send(LISTE_JOUEURS[JOUEUR_I], info_tour + "Finissez l'histoire :")
-			ETAT="FIN_JEU"
-		else:
-			send(LISTE_JOUEURS[JOUEUR_I], info_tour + "Continuez l'histoire :")
+	if(g_etat=="JEU_EN_COURS"):
+		print(g_etat)	
+		
+		g_tour = g_tour+1
+		
+		info_g_tour = "Tour " + str(g_tour) + "/" + str(g_nb_g_tours) + " : "
+		if(g_tour==1):
+			send(g_joueurs[g_indice_joueur], info_g_tour + "Commencez l'histoire :")
+		elif(g_tour < g_nb_g_tours):
+			send(g_joueurs[g_indice_joueur], info_g_tour + "Continuez l'histoire :")
+		elif(g_tour==g_nb_g_tours):
+			send(g_joueurs[g_indice_joueur], info_g_tour + "Finissez l'histoire :")
 		
 		if(message != ""):
-			HISTOIRE += message.split()
-			qlqsMots=""
-			for mot in HISTOIRE[-NB_MOTS_APPARENTS:]:
-				qlqsMots += mot + ' '
-				
-			send(LISTE_JOUEURS[JOUEUR_I], qlqsMots)
-
+			g_mots += message.split()
 			
-		TOUR = TOUR+1
-		JOUEUR_I = (JOUEUR_I+1)%len(LISTE_JOUEURS)
+			if(g_tour<=g_nb_g_tours):
+				qlqsMots=""
+				for mot in g_mots[-g_nb_mots_apparents:]:
+					qlqsMots += mot + ' '
+					
+				send(g_joueurs[g_indice_joueur], qlqsMots)	
+			else:
+				g_etat="FIN_JEU"		
+			
+		g_indice_joueur = (g_indice_joueur+1)%len(g_joueurs)
 		
-	if(ETAT=="FIN_JEU"):
-		print(ETAT)
+	if(g_etat=="FIN_JEU"):
+		print(g_etat)
 		his=''
-		for mot in HISTOIRE:
+		for mot in g_mots:
 			his += mot + ' '
-		sendToAll(LISTE_JOUEURS, "Histoire terminée : " + his)
+		sendToAll(g_joueurs, "Histoire terminée : " + his)
 		
 		
-ETAT = "INIT"
-LISTE_JOUEURS=[]
-NB_TOURS_PAR_JOUEUR=0
-NB_MOTS_APPARENTS=0
-NB_TOURS=0
-JOUEUR_I=0
-HISTOIRE=[]
-TOUR=0
+g_etat = "INIT"
+g_joueurs=[]
+g_g_tours_par_joueur=0
+g_nb_mots_apparents=0
+g_nb_g_tours=0
+g_indice_joueur=0
+g_mots=[]
+g_tour=0
 
-bot = SlackClient(TOKEN)
-if bot.rtm_connect():
-	ETAT="CONNECTE"
+g_bot = SlackClient(TOKEN)
+if g_bot.rtm_connect():
+	g_etat="CONNECTE"
 	try:
 		while True:
-			messages = bot.rtm_read()
+			messages = g_bot.rtm_read()
 			if messages:
 				for message in messages :
 					#print(message)
