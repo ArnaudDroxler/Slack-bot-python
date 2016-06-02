@@ -13,7 +13,9 @@ patience = [
 	{"auteur": "Bouddha", "citation": "La patience est la plus grande des prières."},
 	{"auteur": "Philippe Obrecht", "citation": "La patience est le sourire de l'âme."},
 	{"auteur": "auteur inconnu", "citation": "Le papier a plus de patience que les gens."},
-	{"auteur": "Horace / Odes ", "citation":"La patience adoucit tout mal sans remède."}
+	{"auteur": "Horace / Odes ", "citation":"La patience adoucit tout mal sans remède."},
+	{"auteur": "Horace / Odes ", "citation":"La patience adoucit tout mal sans remède."},
+	{"auteur": "Niro", "citation":"Un peu de patience bientôt j’envoie la purée."}
 ]
 
 def getRandomCitation():
