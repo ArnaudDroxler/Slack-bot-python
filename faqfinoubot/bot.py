@@ -2,6 +2,7 @@ import time
 
 from slackclient import SlackClient
 from config import TOKEN, BOT_ID
+from patience import getRandomCitation
 
 
 g_etat = "INIT"
@@ -105,9 +106,9 @@ def process(user, message):
 				g_indice_joueur = (g_indice_joueur+1)%len(g_joueurs)
 			
 			else:
-				send(user, "Ce n'est pas votre tour")
+				send(user, "Ce n'est pas votre tour, "+getRandomCitation())
 		else:
-			send(user, "Une partie est déjà en cours")
+			send(user, "Une partie est déjà en cours ¯\_(ツ)_/¯")
 
 	if(g_etat=="FIN_JEU"):
 		print(">>>>>> etat : " + g_etat)
