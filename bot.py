@@ -84,6 +84,11 @@ g_mots=[]
 g_tour=0
 
 g_bot = SlackClient(TOKEN)
+botInfos = g_bot.api_call("rtm.start", token=TOKEN)
+if botInfos['ok']:
+	bot_id = botInfos['self']['id']
+	print(bot_id)
+	
 if g_bot.rtm_connect():
 	g_etat="CONNECTE"
 	try:
@@ -91,10 +96,9 @@ if g_bot.rtm_connect():
 			messages = g_bot.rtm_read()
 			if messages:
 				for message in messages :
-					#print(message)
+					print(message)
 					if "type" in message and message['type'] == 'message':
-						if message['user'] != BOT_ID: # id du bot
-							print(message)
+						if message['user'] != bot_id:
 							process(message['user'], message['text'])
 								
 			else:
