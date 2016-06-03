@@ -4,7 +4,6 @@ from slackclient import SlackClient
 from config import TOKEN, BOT_ID
 from patience import getRandomCitation
 
-
 g_etat = "INIT"
 g_joueurs=[]
 g_tours_par_joueur=0
@@ -19,15 +18,18 @@ g_joueur_courant=""
 
 			
 def send(joueur, message) :
+	"""Envoie le message message au joueur joueur"""
 	reponse = g_bot.api_call("chat.postMessage", as_user=True, channel=joueur, text=message)
 	print(reponse)
 
 
 def sendToAll(listeJoueurs, message) :
+	"""Envoie le message message à tous les joueurs contenus dans listeJoueurs"""
 	for joueur in listeJoueurs:
 		send(joueur, message)
 
 def validate(user, message):
+	"""Retourne un booléen qui confirme ou non la syntaxe à la création d'une partie"""
 	global g_joueurs, g_tours_par_joueur, g_nb_mots_apparents
 	
 	print(">>>>>>>> validation du message : " + message)
@@ -58,6 +60,7 @@ def validate(user, message):
 		
 		
 def process(user, message):
+	"""Machine d'état qui traite le message reçu en fonction de l'état d'avancement de la partie"""
 	global g_etat, g_tours_par_joueur, g_nb_mots_apparents, g_joueurs, g_nb_tours, g_indice_joueur, g_mots, g_tour, g_joueur_courant
 	
 	print(">>>> PROCESSING")
@@ -122,7 +125,6 @@ def process(user, message):
 			
 			else:
 				send(user, "Ce n'est pas votre tour, "+getRandomCitation())
-				#send(user, "Ce n'est pas votre tour, ")
 		else:
 			send(user, "Une partie est déjà en cours ¯\_(ツ)_/¯")
 
@@ -136,6 +138,7 @@ def process(user, message):
 
 
 def main():
+	"""Point d'entrée du programme, écoute constament les messages en provenence de slack et appelle la méthode process s'il s'agit d'un message texte d'un utilisateur"""
 	global g_etat, g_slack_users_list
 	
 	botInfos = g_bot.api_call("rtm.start", token=TOKEN)

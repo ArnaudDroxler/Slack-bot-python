@@ -19,5 +19,6 @@ patience = [
 ]
 
 def getRandomCitation():
+	"""Retourne une citation sur le thème de la patience"""
 	citation = choice(patience)
 	return "\n_\"" +  citation["citation"] + "\"_ de " + citation["auteur"]
