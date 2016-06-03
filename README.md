@@ -1,9 +1,9 @@
-# SlackBot 
+# Faqfinoucha 
 
-# But
+## But
 Implémenter le jeu du [cadavre exquis](https://fr.wikipedia.org/wiki/Cadavre_exquis_(jeu)) à l'aide d'un bot Slack.
 
-# Fonctionnement
+## Fonctionnement
 1. Un joueur "admin" veux lancer une partie, il en informe le bot
 2. Pour configurer la partie, le bot demande à l'admin :
  * une liste de joueurs
