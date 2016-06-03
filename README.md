@@ -1,4 +1,4 @@
-# SlackBot 
+# Faqfinoucha 
 
 # But
 Implémenter le jeu du [cadavre exquis](https://fr.wikipedia.org/wiki/Cadavre_exquis_(jeu)) à l'aide d'un bot Slack.
