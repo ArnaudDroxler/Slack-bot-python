@@ -1,4 +1,4 @@
-from random import randint
+from random import choice
 
 patience = [
 	{"auteur": "Jean-Pierre Jarroux", "citation":"Pas de patience, pas de science."},
@@ -19,5 +19,5 @@ patience = [
 ]
 
 def getRandomCitation():
-	citation = patience[randint(0,len(patience)-1)]
+	citation = choice(patience)
 	return "\n_\"" +  citation["citation"] + "\"_ de " + citation["auteur"]
