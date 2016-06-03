@@ -33,23 +33,30 @@ def validate(user, message):
 	global g_joueurs, g_tours_par_joueur, g_nb_mots_apparents
 	
 	print(">>>>>>>> validation du message : " + message)
-	mots = message.split()
-	print(">>>>>>>>>> mots : " + str(mots))
-	if mots[0]=="start" and len(mots) > 3:
+	
+	action, *params = message.split()
+	
+	print(">>>>>>>>>> params : " + str(params))
+	if action=="start" and len(params) > 2:
+	
+		#réinitialise la liste de joueurs en forçant l'ajout du joueur qui lance la partie 
 		g_joueurs = [user]
-		for mot in mots[1:-2]:		# start <@U1DD1U6P4> <@U1DC8A7GW> 2 2 --> <@U1DD1U6P4> <@U1DC8A7GW>
-			joueur = mot[2:-1] 		# <@U1DD1U6P4> --> U1DD1U6P4
+		
+		# itère sur les paramètres sauf les 2 derniers qui sont censé être 2 entiers
+		for param in params[:-2]:	
+			joueur = param[2:-1] # <@U1DD1U6P4> --> U1DD1U6P4
+			
 			if joueur in g_slack_users_list:
 				g_joueurs.append(joueur)
 			else:
 				return False
 		
 		try:
-			g_tours_par_joueur = int(mots[-2])
+			g_tours_par_joueur = int(params[-2])
 		except ValueError:
 			return False
 		try:
-			g_nb_mots_apparents = int(mots[-1])
+			g_nb_mots_apparents = int(params[-1])
 		except ValueError:
 			return False
 			
@@ -69,7 +76,6 @@ def process(user, message):
 	if g_etat=="CONNECTE":
 		print(">>>>>> etat : " + g_etat)
 		
-	
 		tutoriel="Pour commencez une partie, écrivez :\nstart @joueur1 @joueur2 @joueur3 etc... _[nombre de tour par joueur]_ _[nombre de mots apparents]_\nPar Exemple :\nstart @bob @bill @mileyCirus 3 5"
 	
 		if validate(user, message):
@@ -98,27 +104,29 @@ def process(user, message):
 			if g_joueur_courant==user:
 				g_tour = g_tour+1
 
-				info_g_tour = "Tour " + str(g_tour) + "/" + str(g_nb_tours) + " : "
+				msg_a_envoyer = "_Tour " + str(g_tour) + "/" + str(g_nb_tours) + " : "
 				if g_tour==1:
-					send(g_joueurs[g_indice_joueur], info_g_tour + "Commencez l'histoire :")
-				
+					msg_a_envoyer += "Commencez l'histoire :_"
 				else:
 					if g_tour < g_nb_tours:
-						send(g_joueurs[g_indice_joueur], info_g_tour + "Continuez l'histoire :")
+						msg_a_envoyer += "Continuez l'histoire :_\n"
 					elif g_tour==g_nb_tours:
-						send(g_joueurs[g_indice_joueur], info_g_tour + "Finissez l'histoire :")
+						msg_a_envoyer += "Finissez l'histoire :_\n"
 
+					# si on est pas au tour un, c'est que le message contient le début ou la suite de l'histoire
 					g_mots += message.split()
 
+					# affiche les n dernier mots à l'utilisateur
 					qlqsMots=""
 					for mot in g_mots[-g_nb_mots_apparents:]:
 						qlqsMots += mot + ' '
 
-					send(g_joueurs[g_indice_joueur], qlqsMots)
+					msg_a_envoyer += qlqsMots
 					
 					if g_tour>g_nb_tours:
 						g_etat="FIN_JEU"
 						
+				send(g_joueurs[g_indice_joueur], msg_a_envoyer)		
 						
 				g_joueur_courant = g_joueurs[g_indice_joueur]
 				g_indice_joueur = (g_indice_joueur+1)%len(g_joueurs)
@@ -133,7 +141,7 @@ def process(user, message):
 		his=''
 		for mot in g_mots:
 			his += mot + ' '
-		sendToAll(g_joueurs, "Histoire terminée : " + his)
+		sendToAll(g_joueurs, "_Histoire terminée :_ " + his)
 		g_etat = "CONNECTE"
 
 
