@@ -1,5 +1,4 @@
-import time
-
+from time import sleep
 from slackclient import SlackClient
 from config import TOKEN
 from patience import getRandomCitation
@@ -172,7 +171,7 @@ def main():
 								process(message['user'], message['text'])
 
 				else:
-					time.sleep(0.01)
+					sleep(0.01)
 		except KeyboardInterrupt:
 			pass
 	else:
