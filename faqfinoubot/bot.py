@@ -30,8 +30,6 @@ def sendToAll(listeJoueurs, message) :
 def validate(user, message):
 	global g_joueurs, g_tours_par_joueur, g_nb_mots_apparents
 	
-	tutoriel={"ok":False, "error":"Pour commencez une partie, écrivez :\nstart @joueur1 @joueur2 @joueur3 etc... _[nombre de tour par joueur]_ _[nombre de mots apparents]_\nPar Exemple :\nstart @bob @bill @mileyCirus 3 5"}
-	
 	print(">>>>>>>> validation du message : " + message)
 	mots = message.split()
 	print(">>>>>>>>>> mots : " + str(mots))
@@ -42,20 +40,20 @@ def validate(user, message):
 			if joueur in g_slack_users_list:
 				g_joueurs.append(joueur)
 			else:
-				return {"ok":False, "error": mot+" n'est pas connu"}
+				return False
 		
 		try:
 			g_tours_par_joueur = int(mots[-2])
 		except ValueError:
-			return tutoriel
+			return False
 		try:
 			g_nb_mots_apparents = int(mots[-1])
 		except ValueError:
-			return tutoriel
+			return False
 			
-		return {"ok":True}
+		return True
 	else:
-		return tutoriel
+		return False
 		
 		
 		
@@ -68,14 +66,17 @@ def process(user, message):
 	if g_etat=="CONNECTE":
 		print(">>>>>> etat : " + g_etat)
 		
-		validation = validate(user, message);
+	
+		tutoriel="Pour commencez une partie, écrivez :\nstart @joueur1 @joueur2 @joueur3 etc... _[nombre de tour par joueur]_ _[nombre de mots apparents]_\nPar Exemple :\nstart @bob @bill @mileyCirus 3 5"
+	
+		if validate(user, message):
+			g_etat="DEBUT_JEU"
+			sendToAll(g_joueurs, "Une partie de cadavre exquis est lancée, restez attentifs")
+		else:
+			return send(user, tutoriel)
+			
 		print(">>>>>>>> CONFIGURATION : joueurs :" + str(g_joueurs) + " -- nb mots apparents : " + str(g_nb_mots_apparents) + " -- nb tours par joueurs : " + str(g_tours_par_joueur))
 		
-		if validation["ok"]:
-			sendToAll(g_joueurs, "Une partie de cadavre exquis est lancée, restez attentifs")
-			g_etat="DEBUT_JEU"
-		else:
-			send(user, validation["error"])
 
 	if g_etat=="DEBUT_JEU":
 		print(">>>>>> etat : " + g_etat)
@@ -119,6 +120,7 @@ def process(user, message):
 			
 			else:
 				send(user, "Ce n'est pas votre tour, "+getRandomCitation())
+				#send(user, "Ce n'est pas votre tour, ")
 		else:
 			send(user, "Une partie est déjà en cours ¯\_(ツ)_/¯")
 
