@@ -98,23 +98,25 @@ def process(user, message):
 				info_g_tour = "Tour " + str(g_tour) + "/" + str(g_nb_tours) + " : "
 				if g_tour==1:
 					send(g_joueurs[g_indice_joueur], info_g_tour + "Commencez l'histoire :")
-				elif g_tour < g_nb_tours:
-					send(g_joueurs[g_indice_joueur], info_g_tour + "Continuez l'histoire :")
-				elif g_tour==g_nb_tours:
-					send(g_joueurs[g_indice_joueur], info_g_tour + "Finissez l'histoire :")
+				
+				else:
+					if g_tour < g_nb_tours:
+						send(g_joueurs[g_indice_joueur], info_g_tour + "Continuez l'histoire :")
+					elif g_tour==g_nb_tours:
+						send(g_joueurs[g_indice_joueur], info_g_tour + "Finissez l'histoire :")
 
-				if message != "":
 					g_mots += message.split()
 
-					if g_tour<=g_nb_tours:
-						qlqsMots=""
-						for mot in g_mots[-g_nb_mots_apparents:]:
-							qlqsMots += mot + ' '
+					qlqsMots=""
+					for mot in g_mots[-g_nb_mots_apparents:]:
+						qlqsMots += mot + ' '
 
-						send(g_joueurs[g_indice_joueur], qlqsMots)
-					else:
+					send(g_joueurs[g_indice_joueur], qlqsMots)
+					
+					if g_tour>g_nb_tours:
 						g_etat="FIN_JEU"
-
+						
+						
 				g_joueur_courant = g_joueurs[g_indice_joueur]
 				g_indice_joueur = (g_indice_joueur+1)%len(g_joueurs)
 			
