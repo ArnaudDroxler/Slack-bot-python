@@ -17,6 +17,12 @@ class Faqfinoubot:
 		self.slack_users_list=[]
 		self.joueur_courant=""
 		self.tutoriel="Pour commencez une partie, écrivez :\nstart @joueur1 @joueur2 @joueur3 etc... [nombre de tour par joueur] [nombre de mots apparents]\nPar Exemple :\nstart @bob @bill @mileyCirus 3 5"
+		
+		botInfos = self.bot.api_call("rtm.start", token=TOKEN)
+		if botInfos['ok']:
+			self.bot_id = botInfos['self']['id']
+			for member in botInfos['users']:
+				self.slack_users_list.append(member['id'])
 
 		
 	def send(self, joueur, message) :
@@ -31,6 +37,8 @@ class Faqfinoubot:
 
 	def validate(self, user, message):
 		"""Retourne un booléen qui confirme ou non la syntaxe à la création d'une partie"""
+		
+		if not len(message): return False
 		
 		action, *params = message.split()
 
@@ -78,6 +86,7 @@ class Faqfinoubot:
 			self.mots = []
 			self.tour=0
 			self.etat="JEU_EN_COURS"
+			print("jeu en cours")
 			self.joueur_courant=user
 			message = ""
 
@@ -133,12 +142,6 @@ class Faqfinoubot:
 			
 	def run(self):
 		"""Point d'entrée du programme, écoute constament les messages en provenence de slack et appelle la méthode process s'il s'agit d'un message texte d'un utilisateur"""
-		
-		botInfos = self.bot.api_call("rtm.start", token=TOKEN)
-		if botInfos['ok']:
-			bot_id = botInfos['self']['id']
-			for member in botInfos['users']:
-				self.slack_users_list.append(member['id'])
 
 		if self.bot.rtm_connect():
 			self.etat="CONNECTE"
@@ -149,7 +152,7 @@ class Faqfinoubot:
 					if messages:
 						for message in messages :
 							if "type" in message and message['type'] == 'message':
-								if message['user'] != bot_id:
+								if message['user'] != self.bot_id:
 									self.process(message['user'], message['text'])
 
 					else:
