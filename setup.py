@@ -20,16 +20,17 @@ setup(
     license='MIT',
 
     keywords='bot, slackbot, game, cadavre, esquis',
-
     packages=find_packages(),
 
     install_requires=['slackclient'],
     extras_requires={
+        'test': ('pytest')
+        'doc': ('Sphinx')
     },
 
     entry_points={
         'console_scripts': [
-            'faqufinoubot=faqufinoubot:main',
+            'faqufinoubot=faqufinoubot.__main__:main',
         ],
     },
 )

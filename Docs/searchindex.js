@@ -1,0 +1,1 @@
+Search.setIndex({envversion:49,filenames:["doc"],objects:{},objnames:{},objtypes:{},terms:{content:0,index:0,modul:0,pag:0,recherch:0},titles:["Welcome to faqfinoubot&#8217;s documentation!"],titleterms:{and:0,document:0,faqfinoubot:0,indic:0,tabl:0,welcom:0}})
